@@ -9,6 +9,74 @@ interface AnalysisViewProps {
 }
 
 const AnalysisView: React.FC<AnalysisViewProps> = ({ simulation, onReset, onUndo }) => {
+  // Enhanced parser to handle headers and bullet points with consistent spacing
+  const renderAnalysisContent = (text: string = '') => {
+    // Split into lines first to catch all markers
+    const lines = text.split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: React.ReactNode[] = [];
+
+    const flushList = (key: number) => {
+      if (currentList.length > 0) {
+        elements.push(
+          <div key={`list-${key}`} className="space-y-6 my-8">
+            {currentList}
+          </div>
+        );
+        currentList = [];
+      }
+    };
+
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+
+      // Handle Section Headers: **TITLE**
+      if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+        flushList(index);
+        elements.push(
+          <h4 key={index} className="text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs mt-12 mb-6 flex items-center gap-3">
+            <span className="w-8 h-[1px] bg-blue-500/30"></span>
+            {trimmed.replace(/\*\*/g, '')}
+            <span className="flex-1 h-[1px] bg-gradient-to-r from-blue-500/30 to-transparent"></span>
+          </h4>
+        );
+      } 
+      // Handle Bullet Points: - Point or * Point
+      else if (trimmed.startsWith('-') || trimmed.startsWith('*')) {
+        const content = trimmed.substring(1).trim();
+        // Process bolding within bullets
+        const processedContent = content.split('**').map((part, i) => 
+          i % 2 === 1 ? <strong key={i} className="text-white font-bold">{part}</strong> : part
+        );
+
+        currentList.push(
+          <div key={index} className="flex gap-4 items-start group">
+            <div className="mt-2.5 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] flex-shrink-0 transition-transform group-hover:scale-125"></div>
+            <p className="text-zinc-300 text-lg md:text-xl leading-relaxed font-light">
+              {processedContent}
+            </p>
+          </div>
+        );
+      }
+      // Handle standard paragraphs
+      else {
+        flushList(index);
+        const processedPara = trimmed.split('**').map((part, i) => 
+          i % 2 === 1 ? <strong key={i} className="text-white font-bold">{part}</strong> : part
+        );
+        elements.push(
+          <p key={index} className="text-zinc-400 text-lg md:text-xl leading-relaxed mb-6 font-light">
+            {processedPara}
+          </p>
+        );
+      }
+    });
+
+    flushList(999);
+    return elements;
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-16 md:space-y-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 px-4 md:px-0">
       <header className="text-center space-y-6">
@@ -45,33 +113,9 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({ simulation, onReset, onUndo
           <div className="h-[1px] flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
         </div>
         <div className="glass rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-20 border border-white/5 shadow-inner">
-          <div className="prose prose-invert max-w-none">
-             <div className="space-y-10 text-lg md:text-2xl leading-[1.8] md:leading-[1.9] text-zinc-400 font-light">
-               {/* 
-                  The content is expected to be returned with bold headers and lists from the AI. 
-                  We split and render thoughtfully.
-               */}
-               {simulation.analysis?.split('\n\n').map((block, i) => {
-                 const isHeader = block.trim().startsWith('**');
-                 return (
-                   <div key={i} className={isHeader ? "mt-12 mb-4" : ""}>
-                     {block.split('\n').map((line, li) => {
-                       if (line.trim().startsWith('-')) {
-                         return (
-                           <div key={li} className="flex gap-4 mb-4 items-start">
-                             <span className="w-2 h-2 mt-3 rounded-full bg-blue-500/50 flex-shrink-0"></span>
-                             <span className="text-zinc-300">{line.replace('-', '').trim()}</span>
-                           </div>
-                         );
-                       }
-                       if (line.trim().startsWith('**')) {
-                          return <h4 key={li} className="text-blue-400 font-black uppercase tracking-[0.2em] text-xs md:text-sm mb-6">{line.replaceAll('**', '')}</h4>;
-                       }
-                       return <p key={li} className="mb-6">{line}</p>;
-                     })}
-                   </div>
-                 );
-               })}
+          <div className="max-w-none">
+             <div className="space-y-2">
+               {renderAnalysisContent(simulation.analysis)}
              </div>
           </div>
         </div>
