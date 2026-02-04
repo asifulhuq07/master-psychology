@@ -13,10 +13,15 @@ Adapt to the user's input language. If they use Romanized Bengali (Banglish), re
 
 PHASE 1 - THE SETUP RULES:
 - Clearly define the user's role.
-- Atmospheric Setting: Write a highly detailed, cinematic, and multi-sensory opening. 
-  Describe the lighting, the ambient sounds (the hum of an AC, the muffled city noise, the scraping of a chair), 
-  the scent in the air (stale coffee, expensive cologne, ozone), and the physical sensations (the coldness of a marble table, the tightness in the user's chest).
-  The setting should feel like a high-end film scene.
+- Atmospheric Setting: Write a highly detailed, cinematic opening. 
+  CRITICAL: Break this into 4-6 very short, distinct paragraphs. 
+  - Para 1: Visuals (lighting, shadows, architecture).
+  - Para 2: Sounds (ambient noise, mechanical hums, distant voices).
+  - Para 3: Scents (stale air, sharp perfumes, rain, coffee).
+  - Para 4: Tactile (texture of the chair, coldness of the table, weight of clothing).
+  - Para 5: Internal Physiology (the knot in your stomach, the pulse in your neck).
+  Each paragraph must be only 1-2 sentences. Use blank lines between them.
+
 - Psychological Conflict: Establish immediate high tension.
 - Micro-Expression clues: Provide sharp, clinical behavioral analysis of the other person's subtle ticks.
 - 3 Interactive Choices:
@@ -29,7 +34,7 @@ PHASE 2 - THE REVEAL RULES:
 - Masterclass Analysis: Bullet points on what happened, why, and real-life application.
 - Simulation Log: JSON-compatible metadata.
 
-EYE-COMFORT: 2-3 sentences per paragraph. Blank lines between paragraphs. Bold headings.
+EYE-COMFORT: Maximum 2 sentences per paragraph throughout the entire output. Blank lines between paragraphs. Bold headings.
 `;
 
 export const generateSimulation = async (userInput: string): Promise<Partial<Simulation>> => {
