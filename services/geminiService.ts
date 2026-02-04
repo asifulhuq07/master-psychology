@@ -30,11 +30,22 @@ PHASE 1 - THE SETUP RULES:
   3. Strategic Psychological Control (Calculated, status-focused, high EQ)
 
 PHASE 2 - THE REVEAL RULES:
-- Detailed Narrative Outcome: The immediate consequence of the action.
-- Masterclass Analysis: Bullet points on what happened, why, and real-life application.
-- Simulation Log: JSON-compatible metadata.
+- Detailed Narrative Outcome: The immediate consequence. Use 2-3 short paragraphs max.
+- Masterclass Analysis: 
+  Structure this with bold sub-headers:
+  **THE PSYCHOLOGY**
+  - Point about the specific behavior.
+  **SOCIAL DYNAMICS**
+  - Point about status or power shifts.
+  **REAL-WORLD APPLICATION**
+  - Actionable advice.
 
-EYE-COMFORT: Maximum 2 sentences per paragraph throughout the entire output. Blank lines between paragraphs. Bold headings.
+EYE-COMFORT WRITING STYLE:
+- Maximum 2 sentences per paragraph.
+- Always include a blank line between paragraphs.
+- Use bolding for emphasis on key psychological terms.
+- Use bullet points for all lists.
+- Avoid dense blocks of text.
 `;
 
 export const generateSimulation = async (userInput: string): Promise<Partial<Simulation>> => {
@@ -85,7 +96,7 @@ export const generateReveal = async (simulation: Simulation, choice: Choice): Pr
     The user chose: "${choice.label}: ${choice.text}" (Type: ${choice.type})
     
     Provide the Outcome, Masterclass Analysis, and Simulation Log.
-    The analysis must be deep, clinical, and strategic.
+    Adhere strictly to the EYE-COMFORT WRITING STYLE: short paragraphs, bold sub-headers, and bullet points.
   `;
 
   const response = await ai.models.generateContent({
