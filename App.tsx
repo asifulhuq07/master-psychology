@@ -12,37 +12,53 @@ const App: React.FC = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState('');
   
   const progressIntervalRef = useRef<number | null>(null);
 
-  const startProgress = () => {
+  const REVEAL_MESSAGES = [
+    "Analyzing micro-expressions...",
+    "Calculating status shift...",
+    "Simulating social gravity...",
+    "Measuring cortisol response...",
+    "Synthesizing narrative path...",
+    "Finalizing masterclass data..."
+  ];
+
+  const startProgress = (isReveal = false) => {
     setLoadingProgress(0);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     
-    // Increased frequency to 100ms for snappier feel
     progressIntervalRef.current = window.setInterval(() => {
       setLoadingProgress(prev => {
         if (prev >= 98) return prev; 
-        // Asymptotic progression: moves faster at the start, slows down near the end
         const remaining = 100 - prev;
-        const increment = (Math.random() * (remaining * 0.25)) + 1.5;
-        return Math.min(98, prev + increment);
+        const increment = (Math.random() * (remaining * 0.3)) + 1.2;
+        const next = Math.min(98, prev + increment);
+        
+        if (isReveal) {
+          const msgIdx = Math.floor((next / 100) * REVEAL_MESSAGES.length);
+          setLoadingStatus(REVEAL_MESSAGES[msgIdx] || REVEAL_MESSAGES[REVEAL_MESSAGES.length - 1]);
+        }
+        
+        return next;
       });
-    }, 100);
+    }, 120);
   };
 
   const completeProgress = () => {
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     setLoadingProgress(100);
-    // Reduced exit delay for instant feedback
     setTimeout(() => {
       setIsLoading(false);
       setLoadingProgress(0);
-    }, 150);
+      setLoadingStatus('');
+    }, 250);
   };
 
   const startNewSimulation = useCallback(async (input?: string) => {
     setIsLoading(true);
+    setLoadingStatus('Initializing Engine...');
     startProgress();
     try {
       const data = await generateSimulation(input || '');
@@ -68,7 +84,7 @@ const App: React.FC = () => {
   const handleChoiceSelect = async (choice: Choice) => {
     if (!currentSim) return;
     setIsLoading(true);
-    startProgress();
+    startProgress(true);
     try {
       const { outcome, analysis, log } = await generateReveal(currentSim, choice);
       const updatedSim: Simulation = {
@@ -80,22 +96,28 @@ const App: React.FC = () => {
       };
       setCurrentSim(updatedSim);
       
-      // Update Archive
       setArchive(prev => {
         const lang = log.language || 'English';
         const type = log.conflictType || ConflictType.SOCIAL;
         
-        const existingEntryIndex = prev.findIndex(e => e.language === lang && e.conflictType === type);
+        // Remove existing version of this simulation from all archive categories to prevent duplicates
+        const filteredArchive = prev.map(category => ({
+          ...category,
+          simulations: category.simulations.filter(s => s.id !== updatedSim.id)
+        })).filter(category => category.simulations.length > 0);
+
+        // Find or create the target category
+        const categoryIndex = filteredArchive.findIndex(e => e.language === lang && e.conflictType === type);
         
-        if (existingEntryIndex > -1) {
-          const newArchive = [...prev];
-          newArchive[existingEntryIndex] = {
-            ...newArchive[existingEntryIndex],
-            simulations: [updatedSim, ...newArchive[existingEntryIndex].simulations]
+        if (categoryIndex > -1) {
+          const newArchive = [...filteredArchive];
+          newArchive[categoryIndex] = {
+            ...newArchive[categoryIndex],
+            simulations: [updatedSim, ...newArchive[categoryIndex].simulations]
           };
           return newArchive;
         } else {
-          return [...prev, { language: lang, conflictType: type, simulations: [updatedSim] }];
+          return [...filteredArchive, { language: lang, conflictType: type, simulations: [updatedSim] }];
         }
       });
     } catch (error) {
@@ -194,7 +216,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
              <div className="hidden sm:flex flex-col items-end mr-2">
                <span className="text-[10px] uppercase tracking-widest font-black text-zinc-500">System Status</span>
-               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Syncing...' : 'Optimized'}</span>
+               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Processing...' : 'Optimized'}</span>
              </div>
              <div className={`w-3 h-3 rounded-full shadow-lg ${isLoading ? 'bg-blue-500 animate-pulse shadow-blue-500/50' : 'bg-green-500 shadow-green-500/50'}`}></div>
           </div>
@@ -246,19 +268,16 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {isLoading && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass">
-                   <div className="relative">
+              {isLoading && !currentSim && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass animate-in fade-in duration-500">
+                   <div className="relative mb-12">
                      <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
                      <div className="absolute inset-0 flex items-center justify-center flex-col">
                        <span className="text-blue-500 font-black text-lg">{Math.round(loadingProgress)}%</span>
                      </div>
                    </div>
-                   <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 mt-10 animate-pulse">
-                     Synthesizing Behaviour
-                   </p>
-                   <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">
-                     Processing: {Math.round(loadingProgress)}%
+                   <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 mt-4 animate-pulse">
+                     Synthesizing Arena
                    </p>
                 </div>
               )}
@@ -282,24 +301,72 @@ const App: React.FC = () => {
           )}
         </div>
 
-        {/* Reveal Phase Loading */}
+        {/* Beautiful Animated Reveal Loading Overlay */}
         {isLoading && currentSim && currentSim.selectedChoiceId && (
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass">
-            <div className="relative">
-              <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin mb-10"></div>
-              <div className="absolute inset-0 flex items-center justify-center -mt-10">
-                <span className="text-blue-500 font-black text-lg">{Math.round(loadingProgress)}%</span>
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center glass animate-in fade-in duration-700">
+            <div className="max-w-md w-full px-8 flex flex-col items-center space-y-10">
+              {/* Central Visual Hub */}
+              <div className="relative w-32 h-32">
+                {/* Layered Spinners */}
+                <div className="absolute inset-0 border-[3px] border-blue-500/5 border-t-blue-500 rounded-full animate-spin duration-[1.5s]"></div>
+                <div className="absolute inset-2 border-[2px] border-purple-500/5 border-b-purple-500 rounded-full animate-spin-reverse duration-[2s]"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <span className="text-3xl font-black text-white">{Math.round(loadingProgress)}</span>
+                    <span className="text-[10px] block font-black text-blue-500 -mt-1 uppercase tracking-tighter">%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Header */}
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-bold uppercase tracking-[0.3em] text-white animate-pulse">
+                  Extracting Tactical Insight
+                </h3>
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] h-4">
+                  {loadingStatus}
+                </p>
+              </div>
+
+              {/* Progress Bar Container */}
+              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative group">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-600 via-blue-400 to-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all duration-300 ease-out"
+                  style={{ width: `${loadingProgress}%` }}
+                ></div>
+                {/* Scanner Light Effect */}
+                <div className="absolute top-0 left-0 h-full w-20 bg-white/40 blur-md animate-scan-fast"></div>
+              </div>
+
+              {/* Bottom Subtle Tag */}
+              <div className="pt-4">
+                <div className="flex items-center gap-2 opacity-30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                  <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Behavioural Engine 5.0 Synapse Bridge</span>
+                </div>
               </div>
             </div>
-            <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 animate-pulse">
-              Extracting Tactical Insight
-            </p>
-            <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60 text-center">
-              Processing Neural Patterns... {Math.round(loadingProgress)}%
-            </p>
           </div>
         )}
       </main>
+
+      {/* Global CSS for custom animations */}
+      <style>{`
+        @keyframes scan-fast {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(500%); }
+        }
+        .animate-scan-fast {
+          animation: scan-fast 1s infinite linear;
+        }
+        @keyframes spin-reverse {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(-360deg); }
+        }
+        .animate-spin-reverse {
+          animation: spin-reverse 2s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
