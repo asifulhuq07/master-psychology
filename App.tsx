@@ -17,30 +17,29 @@ const App: React.FC = () => {
   const progressIntervalRef = useRef<number | null>(null);
 
   const REVEAL_MESSAGES = [
-    "Initializing Neuro-Link...",
+    "Syncing Neural-Link...",
     "Scanning Social Patterns...",
     "Calculating Status Flux...",
-    "Extracting Hidden Motives...",
-    "Rendering Tactical Outcomes...",
-    "Finalizing Masterclass Data..."
+    "Extracting Motives...",
+    "Rendering Outcomes...",
+    "Finalizing Masterclass..."
   ];
 
-  // Enhanced progress logic for "Realistic" feel
+  // Optimized progress logic for faster "Perceived" feel without losing realism
   const startProgress = (isReveal = false) => {
     setLoadingProgress(0);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     
     progressIntervalRef.current = window.setInterval(() => {
       setLoadingProgress(prev => {
-        if (prev >= 99) return prev; 
+        if (prev >= 98) return prev; 
         
-        // Progress curve: faster at start, slower as it nears 100
         const remaining = 100 - prev;
-        // Add random "bursts" of processing
-        const isBurst = Math.random() > 0.9;
-        const burst = isBurst ? (Math.random() * 5) : 0;
-        const increment = (Math.random() * (remaining * 0.1)) + 0.2 + burst;
-        const next = Math.min(99, prev + increment);
+        // Faster initial ramp-up, smoother end
+        const isBurst = Math.random() > 0.85;
+        const burst = isBurst ? (Math.random() * 8) : 0;
+        const increment = (Math.random() * (remaining * 0.15)) + 0.5 + burst;
+        const next = Math.min(98, prev + increment);
         
         if (isReveal) {
           const msgIdx = Math.floor((next / 100) * REVEAL_MESSAGES.length);
@@ -49,17 +48,18 @@ const App: React.FC = () => {
         
         return next;
       });
-    }, 80); // Higher frequency for smoother number movement
+    }, 50); // Faster tick rate for smoother and quicker progression
   };
 
   const completeProgress = () => {
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     setLoadingProgress(100);
+    // Reduced finish delay from 400ms to 200ms for snappier transition
     setTimeout(() => {
       setIsLoading(false);
       setLoadingProgress(0);
       setLoadingStatus('');
-    }, 400); // Slightly longer for the "100%" to be visible
+    }, 200); 
   };
 
   const startNewSimulation = useCallback(async (input?: string) => {
