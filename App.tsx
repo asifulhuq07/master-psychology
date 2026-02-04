@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Simulation, Choice, ArchiveEntry, ConflictType } from './types';
 import { generateSimulation, generateReveal } from './services/geminiService';
 import SimulationScene from './components/SimulationScene';
@@ -9,11 +9,37 @@ const App: React.FC = () => {
   const [currentSim, setCurrentSim] = useState<Simulation | null>(null);
   const [archive, setArchive] = useState<ArchiveEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const progressIntervalRef = useRef<number | null>(null);
+
+  const startProgress = () => {
+    setLoadingProgress(0);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    
+    progressIntervalRef.current = window.setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 95) return prev; // Stay at 95 until manual completion
+        const increment = Math.random() * 15;
+        return Math.min(95, prev + increment);
+      });
+    }, 400);
+  };
+
+  const completeProgress = () => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    setLoadingProgress(100);
+    setTimeout(() => {
+      setIsLoading(false);
+      setLoadingProgress(0);
+    }, 300);
+  };
 
   const startNewSimulation = useCallback(async (input?: string) => {
     setIsLoading(true);
+    startProgress();
     try {
       const data = await generateSimulation(input || '');
       const newSim: Simulation = {
@@ -29,14 +55,16 @@ const App: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('The engine encountered a friction point. Please retry.');
-    } finally {
       setIsLoading(false);
+    } finally {
+      completeProgress();
     }
   }, []);
 
   const handleChoiceSelect = async (choice: Choice) => {
     if (!currentSim) return;
     setIsLoading(true);
+    startProgress();
     try {
       const { outcome, analysis, log } = await generateReveal(currentSim, choice);
       const updatedSim: Simulation = {
@@ -69,8 +97,9 @@ const App: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('The reveal phase encountered an error.');
-    } finally {
       setIsLoading(false);
+    } finally {
+      completeProgress();
     }
   };
 
@@ -217,14 +246,16 @@ const App: React.FC = () => {
                 <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass">
                    <div className="relative">
                      <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
-                     <div className="absolute inset-0 flex items-center justify-center">
-                       <i className="fa-solid fa-brain text-blue-500 animate-pulse text-2xl"></i>
+                     <div className="absolute inset-0 flex items-center justify-center flex-col">
+                       <span className="text-blue-500 font-black text-lg">{Math.round(loadingProgress)}%</span>
                      </div>
                    </div>
                    <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 mt-10 animate-pulse">
                      Synthesizing Behaviour
                    </p>
-                   <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">Adjusting Neural Parameters...</p>
+                   <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">
+                     Neural Sync: {Math.round(loadingProgress)}% Complete
+                   </p>
                 </div>
               )}
             </div>
@@ -250,11 +281,18 @@ const App: React.FC = () => {
         {/* Reveal Phase Loading */}
         {isLoading && currentSim && currentSim.selectedChoiceId && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass">
-            <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin mb-10"></div>
+            <div className="relative">
+              <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin mb-10"></div>
+              <div className="absolute inset-0 flex items-center justify-center -mt-10">
+                <span className="text-blue-500 font-black text-lg">{Math.round(loadingProgress)}%</span>
+              </div>
+            </div>
             <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 animate-pulse">
               Extracting Tactical Insight
             </p>
-            <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">Scanning psychological outcomes...</p>
+            <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">
+              Processing Neural Patterns... {Math.round(loadingProgress)}%
+            </p>
           </div>
         )}
       </main>
