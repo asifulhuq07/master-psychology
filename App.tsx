@@ -17,24 +17,30 @@ const App: React.FC = () => {
   const progressIntervalRef = useRef<number | null>(null);
 
   const REVEAL_MESSAGES = [
-    "Analyzing micro-expressions...",
-    "Calculating status shift...",
-    "Simulating social gravity...",
-    "Measuring cortisol response...",
-    "Synthesizing narrative path...",
-    "Finalizing masterclass data..."
+    "Initializing Neuro-Link...",
+    "Scanning Social Patterns...",
+    "Calculating Status Flux...",
+    "Extracting Hidden Motives...",
+    "Rendering Tactical Outcomes...",
+    "Finalizing Masterclass Data..."
   ];
 
+  // Enhanced progress logic for "Realistic" feel
   const startProgress = (isReveal = false) => {
     setLoadingProgress(0);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     
     progressIntervalRef.current = window.setInterval(() => {
       setLoadingProgress(prev => {
-        if (prev >= 98) return prev; 
+        if (prev >= 99) return prev; 
+        
+        // Progress curve: faster at start, slower as it nears 100
         const remaining = 100 - prev;
-        const increment = (Math.random() * (remaining * 0.3)) + 1.2;
-        const next = Math.min(98, prev + increment);
+        // Add random "bursts" of processing
+        const isBurst = Math.random() > 0.9;
+        const burst = isBurst ? (Math.random() * 5) : 0;
+        const increment = (Math.random() * (remaining * 0.1)) + 0.2 + burst;
+        const next = Math.min(99, prev + increment);
         
         if (isReveal) {
           const msgIdx = Math.floor((next / 100) * REVEAL_MESSAGES.length);
@@ -43,7 +49,7 @@ const App: React.FC = () => {
         
         return next;
       });
-    }, 120);
+    }, 80); // Higher frequency for smoother number movement
   };
 
   const completeProgress = () => {
@@ -53,12 +59,12 @@ const App: React.FC = () => {
       setIsLoading(false);
       setLoadingProgress(0);
       setLoadingStatus('');
-    }, 250);
+    }, 400); // Slightly longer for the "100%" to be visible
   };
 
   const startNewSimulation = useCallback(async (input?: string) => {
     setIsLoading(true);
-    setLoadingStatus('Initializing Engine...');
+    setLoadingStatus('Awakening Engine...');
     startProgress();
     try {
       const data = await generateSimulation(input || '');
@@ -154,7 +160,7 @@ const App: React.FC = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 md:w-80 glass border-r border-white/5 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-500 overflow-y-auto`}>
         <div className="p-6 md:p-8 space-y-8 md:space-y-10">
           <div className="flex items-center justify-between">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500">Global Archive</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500">Archive Vault</h3>
             <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-zinc-400 p-2 hover:bg-white/5 rounded-full">
               <i className="fa-solid fa-times"></i>
             </button>
@@ -165,7 +171,7 @@ const App: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center mx-auto mb-4">
                 <i className="fa-solid fa-database text-zinc-700"></i>
               </div>
-              <p className="text-[13px] text-zinc-600 font-medium leading-relaxed italic">No simulations recorded in current session.</p>
+              <p className="text-[13px] text-zinc-600 font-medium leading-relaxed italic">The simulation ledger is empty.</p>
             </div>
           ) : (
             <div className="space-y-8 md:space-y-10">
@@ -214,7 +220,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
              <div className="hidden sm:flex flex-col items-end mr-2">
                <span className="text-[10px] uppercase tracking-widest font-black text-zinc-500">System Status</span>
-               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Processing...' : 'Optimized'}</span>
+               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Processing' : 'Optimized'}</span>
              </div>
              <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-lg ${isLoading ? 'bg-blue-500 animate-pulse shadow-blue-500/50' : 'bg-green-500 shadow-green-500/50'}`}></div>
           </div>
@@ -228,7 +234,7 @@ const App: React.FC = () => {
                   The Arena of Strategic Influence
                 </h2>
                 <p className="text-zinc-400 text-base md:text-2xl font-light leading-relaxed md:leading-[1.7] max-w-2xl mx-auto px-4 md:px-0">
-                  Deconstruct complex social friction and sharpen your tactical empathy through hyper-realistic behavioral simulations.
+                  Master complex human dynamics. Sharpen your tactical empathy through hyper-realistic behavioral simulations.
                 </p>
               </div>
 
@@ -252,33 +258,7 @@ const App: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                
-                <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                  <button onClick={() => startNewSimulation('Negotiating with a high-stakes investor')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
-                    Capital Negotiation
-                  </button>
-                  <button onClick={() => startNewSimulation('Navigating a power play in a team setting')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
-                    Status Power Play
-                  </button>
-                  <button onClick={() => startNewSimulation('Public apology after a major strategic failure')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
-                    Crisis Comms
-                  </button>
-                </div>
               </div>
-
-              {isLoading && !currentSim && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass animate-in fade-in duration-500">
-                   <div className="relative mb-12">
-                     <div className="w-20 h-20 md:w-24 md:h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
-                     <div className="absolute inset-0 flex items-center justify-center flex-col">
-                       <span className="text-blue-500 font-black text-sm md:text-lg">{Math.round(loadingProgress)}%</span>
-                     </div>
-                   </div>
-                   <p className="text-lg md:text-2xl font-light tracking-[0.2em] md:tracking-[0.3em] uppercase text-blue-400 mt-4 animate-pulse">
-                     Synthesizing Arena
-                   </p>
-                </div>
-              )}
             </div>
           ) : (
             <div className="py-2 md:py-6">
@@ -299,49 +279,85 @@ const App: React.FC = () => {
           )}
         </div>
 
-        {/* Beautiful Animated Reveal Loading Overlay */}
-        {isLoading && currentSim && currentSim.selectedChoiceId && (
-          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center glass animate-in fade-in duration-700 px-6">
-            <div className="max-w-md w-full flex flex-col items-center space-y-8 md:space-y-10">
-              {/* Central Visual Hub */}
-              <div className="relative w-24 h-24 md:w-32 md:h-32">
-                {/* Layered Spinners */}
-                <div className="absolute inset-0 border-[2px] md:border-[3px] border-blue-500/5 border-t-blue-500 rounded-full animate-spin duration-[1.5s]"></div>
-                <div className="absolute inset-2 border-[1.5px] md:border-[2px] border-purple-500/5 border-b-purple-500 rounded-full animate-spin-reverse duration-[2s]"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
+        {/* Cinematic Animated Reveal Loading Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center glass animate-in fade-in duration-700 px-6 overflow-hidden">
+            {/* Background Synapse Effect (Subtle pulse) */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_70%)] animate-pulse"></div>
+
+            <div className="max-w-md w-full flex flex-col items-center space-y-12 md:space-y-16 relative">
+              {/* Central Progress Core */}
+              <div className="relative">
+                {/* Rotating Rings */}
+                <div className="absolute -inset-10 border-[1px] border-blue-500/10 rounded-full animate-spin duration-[10s]"></div>
+                <div className="absolute -inset-16 border-[1px] border-purple-500/10 rounded-full animate-spin-reverse duration-[15s]"></div>
+                
+                <div className="relative w-32 h-32 md:w-44 md:h-44 flex items-center justify-center">
+                  <svg className="absolute inset-0 w-full h-full -rotate-90">
+                    <circle
+                      cx="50%"
+                      cy="50%"
+                      r="48%"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.05)"
+                      strokeWidth="2"
+                    />
+                    <circle
+                      cx="50%"
+                      cy="50%"
+                      r="48%"
+                      fill="none"
+                      stroke="url(#progressGradient)"
+                      strokeWidth="3"
+                      strokeDasharray="100"
+                      strokeDashoffset={100 - loadingProgress}
+                      strokeLinecap="round"
+                      className="transition-all duration-300 ease-out"
+                      style={{ strokeDasharray: '276', strokeDashoffset: 276 - (276 * loadingProgress) / 100 }}
+                    />
+                    <defs>
+                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#3b82f6" />
+                        <stop offset="100%" stopColor="#a855f7" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  
                   <div className="text-center">
-                    <span className="text-2xl md:text-3xl font-black text-white">{Math.round(loadingProgress)}</span>
-                    <span className="text-[8px] md:text-[10px] block font-black text-blue-500 -mt-1 uppercase tracking-tighter">%</span>
+                    <span className="text-4xl md:text-6xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                      {Math.round(loadingProgress)}
+                    </span>
+                    <span className="text-[10px] md:text-xs block font-black text-blue-400 mt-1 uppercase tracking-[0.4em]">Percent</span>
                   </div>
                 </div>
               </div>
 
-              {/* Status Header */}
-              <div className="text-center space-y-2">
-                <h3 className="text-base md:text-xl font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-white animate-pulse">
-                  Extracting Tactical Insight
-                </h3>
-                <p className="text-zinc-500 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] h-4">
+              {/* Status Indicator */}
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                  <h3 className="text-lg md:text-2xl font-black uppercase tracking-[0.3em] text-white">
+                    {currentSim?.selectedChoiceId ? 'Processing Choice' : 'Synthesis Initiated'}
+                  </h3>
+                </div>
+                <p className="text-zinc-500 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] h-4 animate-pulse">
                   {loadingStatus}
                 </p>
               </div>
 
-              {/* Progress Bar Container */}
-              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative group">
+              {/* Minimal Progress Line */}
+              <div className="w-64 h-0.5 bg-white/5 rounded-full overflow-hidden relative">
                 <div 
-                  className="h-full bg-gradient-to-r from-blue-600 via-blue-400 to-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all duration-300 ease-out"
+                  className="h-full bg-gradient-to-r from-blue-600 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all duration-300"
                   style={{ width: `${loadingProgress}%` }}
                 ></div>
-                {/* Scanner Light Effect */}
-                <div className="absolute top-0 left-0 h-full w-20 bg-white/40 blur-md animate-scan-fast"></div>
               </div>
 
-              {/* Bottom Subtle Tag */}
-              <div className="pt-2 md:pt-4">
-                <div className="flex items-center gap-2 opacity-30">
-                  <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-blue-500 animate-ping"></span>
-                  <span className="text-[7px] md:text-[9px] uppercase font-black tracking-widest text-zinc-400">Behavioural Engine 5.0 Synapse Bridge</span>
-                </div>
+              {/* Neural Tag */}
+              <div className="opacity-20 flex items-center gap-3">
+                 <div className="h-[1px] w-8 bg-zinc-600"></div>
+                 <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-zinc-400">Behavioural Engine V5.0 Neural Array</span>
+                 <div className="h-[1px] w-8 bg-zinc-600"></div>
               </div>
             </div>
           </div>
@@ -362,7 +378,10 @@ const App: React.FC = () => {
           to { transform: rotate(-360deg); }
         }
         .animate-spin-reverse {
-          animation: spin-reverse 2s linear infinite;
+          animation: spin-reverse 20s linear infinite;
+        }
+        .animate-spin {
+          animation: spin 15s linear infinite;
         }
       `}</style>
     </div>
