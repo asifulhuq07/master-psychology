@@ -19,22 +19,26 @@ const App: React.FC = () => {
     setLoadingProgress(0);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     
+    // Increased frequency to 100ms for snappier feel
     progressIntervalRef.current = window.setInterval(() => {
       setLoadingProgress(prev => {
-        if (prev >= 95) return prev; // Stay at 95 until manual completion
-        const increment = Math.random() * 15;
-        return Math.min(95, prev + increment);
+        if (prev >= 98) return prev; 
+        // Asymptotic progression: moves faster at the start, slows down near the end
+        const remaining = 100 - prev;
+        const increment = (Math.random() * (remaining * 0.25)) + 1.5;
+        return Math.min(98, prev + increment);
       });
-    }, 400);
+    }, 100);
   };
 
   const completeProgress = () => {
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     setLoadingProgress(100);
+    // Reduced exit delay for instant feedback
     setTimeout(() => {
       setIsLoading(false);
       setLoadingProgress(0);
-    }, 300);
+    }, 150);
   };
 
   const startNewSimulation = useCallback(async (input?: string) => {
@@ -125,7 +129,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 flex flex-col md:flex-row font-inter">
       {/* Sidebar - Archives */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-80 glass border-r border-white/5 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-500 overflow-y-auto`}>
         <div className="p-8 space-y-10">
@@ -190,7 +194,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
              <div className="hidden sm:flex flex-col items-end mr-2">
                <span className="text-[10px] uppercase tracking-widest font-black text-zinc-500">System Status</span>
-               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Syncing Synapses...' : 'Optimized'}</span>
+               <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Syncing...' : 'Optimized'}</span>
              </div>
              <div className={`w-3 h-3 rounded-full shadow-lg ${isLoading ? 'bg-blue-500 animate-pulse shadow-blue-500/50' : 'bg-green-500 shadow-green-500/50'}`}></div>
           </div>
@@ -254,7 +258,7 @@ const App: React.FC = () => {
                      Synthesizing Behaviour
                    </p>
                    <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">
-                     Neural Sync: {Math.round(loadingProgress)}% Complete
+                     Processing: {Math.round(loadingProgress)}%
                    </p>
                 </div>
               )}
@@ -290,7 +294,7 @@ const App: React.FC = () => {
             <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 animate-pulse">
               Extracting Tactical Insight
             </p>
-            <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60">
+            <p className="text-zinc-500 text-sm mt-4 font-bold tracking-widest uppercase opacity-60 text-center">
               Processing Neural Patterns... {Math.round(loadingProgress)}%
             </p>
           </div>
