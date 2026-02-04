@@ -37,11 +37,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        /* Improving line length for readability */
+        /* Critical for eye comfort: limit line length for prose */
         .readable-width {
-            max-width: 70ch;
+            max-width: 75ch; /* Optimal for reading on desktop */
             margin-left: auto;
             margin-right: auto;
+        }
+        @media (max-width: 640px) {
+            .readable-width {
+                max-width: 100%; /* Use full width on mobile but with padding */
+            }
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -56,6 +61,17 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #3f3f46;
+        }
+        /* Fluid Typography help */
+        .prose-lg-mobile {
+            font-size: 1.05rem;
+            line-height: 1.75;
+        }
+        @media (min-width: 768px) {
+            .prose-lg-mobile {
+                font-size: 1.125rem;
+                line-height: 1.8;
+            }
         }
     </style>
 <script type="importmap">

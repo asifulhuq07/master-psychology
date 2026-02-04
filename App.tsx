@@ -100,13 +100,11 @@ const App: React.FC = () => {
         const lang = log.language || 'English';
         const type = log.conflictType || ConflictType.SOCIAL;
         
-        // Remove existing version of this simulation from all archive categories to prevent duplicates
         const filteredArchive = prev.map(category => ({
           ...category,
           simulations: category.simulations.filter(s => s.id !== updatedSim.id)
         })).filter(category => category.simulations.length > 0);
 
-        // Find or create the target category
         const categoryIndex = filteredArchive.findIndex(e => e.language === lang && e.conflictType === type);
         
         if (categoryIndex > -1) {
@@ -151,10 +149,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 flex flex-col md:flex-row font-inter">
+    <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 flex flex-col md:flex-row font-inter selection:bg-blue-500/30">
       {/* Sidebar - Archives */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-80 glass border-r border-white/5 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-500 overflow-y-auto`}>
-        <div className="p-8 space-y-10">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 md:w-80 glass border-r border-white/5 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-500 overflow-y-auto`}>
+        <div className="p-6 md:p-8 space-y-8 md:space-y-10">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500">Global Archive</h3>
             <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-zinc-400 p-2 hover:bg-white/5 rounded-full">
@@ -163,14 +161,14 @@ const App: React.FC = () => {
           </div>
           
           {archive.length === 0 ? (
-            <div className="space-y-4 pt-10 text-center">
+            <div className="space-y-4 pt-10 text-center px-4">
               <div className="w-12 h-12 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center mx-auto mb-4">
                 <i className="fa-solid fa-database text-zinc-700"></i>
               </div>
-              <p className="text-sm text-zinc-600 font-medium leading-relaxed italic">No simulations recorded in current session.</p>
+              <p className="text-[13px] text-zinc-600 font-medium leading-relaxed italic">No simulations recorded in current session.</p>
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-8 md:space-y-10">
               {archive.map((entry, idx) => (
                 <div key={idx} className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -200,16 +198,16 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 relative overflow-y-auto h-screen scroll-smooth">
-        <header className="sticky top-0 z-40 glass p-5 md:p-8 border-b border-white/5 flex items-center justify-between shadow-2xl shadow-black/20">
-          <div className="flex items-center gap-6">
+        <header className="sticky top-0 z-40 glass p-4 md:p-8 border-b border-white/5 flex items-center justify-between shadow-2xl shadow-black/20">
+          <div className="flex items-center gap-4 md:gap-6">
             <button onClick={() => setIsSidebarOpen(true)} className="md:hidden text-zinc-400 p-3 hover:bg-white/5 rounded-xl border border-white/5">
               <i className="fa-solid fa-bars-staggered"></i>
             </button>
-            <div className="space-y-1">
-              <h1 className="text-xl md:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-                Master Psychology <span className="bg-blue-600 text-[10px] px-2 py-0.5 rounded-md font-black tracking-widest align-middle">V5.0</span>
+            <div className="space-y-0.5 md:space-y-1">
+              <h1 className="text-base md:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2 md:gap-3">
+                Master Psychology <span className="bg-blue-600 text-[8px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-black tracking-widest align-middle">V5.0</span>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold">Behavioural Engine Protocol</p>
+              <p className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-zinc-500 font-bold">Behavioural Engine Protocol</p>
             </div>
           </div>
 
@@ -218,51 +216,51 @@ const App: React.FC = () => {
                <span className="text-[10px] uppercase tracking-widest font-black text-zinc-500">System Status</span>
                <span className="text-[11px] font-bold text-zinc-400">{isLoading ? 'Processing...' : 'Optimized'}</span>
              </div>
-             <div className={`w-3 h-3 rounded-full shadow-lg ${isLoading ? 'bg-blue-500 animate-pulse shadow-blue-500/50' : 'bg-green-500 shadow-green-500/50'}`}></div>
+             <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-lg ${isLoading ? 'bg-blue-500 animate-pulse shadow-blue-500/50' : 'bg-green-500 shadow-green-500/50'}`}></div>
           </div>
         </header>
 
-        <div className="px-6 md:px-14 py-16 max-w-7xl mx-auto">
+        <div className="px-4 md:px-14 lg:px-20 py-10 md:py-16 max-w-7xl mx-auto">
           {!currentSim ? (
-            <div className="flex flex-col items-center justify-center min-h-[65vh] text-center space-y-16 py-10">
-              <div className="space-y-8 max-w-3xl">
-                <h2 className="text-5xl md:text-7xl font-bold serif-header highlight-accent leading-[1.15] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] md:min-h-[65vh] text-center space-y-10 md:space-y-16 py-6 md:py-10">
+              <div className="space-y-6 md:space-y-8 max-w-3xl">
+                <h2 className="text-3xl md:text-7xl font-bold serif-header highlight-accent leading-[1.15] animate-in fade-in slide-in-from-bottom-8 duration-1000">
                   The Arena of Strategic Influence
                 </h2>
-                <p className="text-zinc-400 text-xl md:text-2xl font-light leading-[1.7] max-w-2xl mx-auto">
+                <p className="text-zinc-400 text-base md:text-2xl font-light leading-relaxed md:leading-[1.7] max-w-2xl mx-auto px-4 md:px-0">
                   Deconstruct complex social friction and sharpen your tactical empathy through hyper-realistic behavioral simulations.
                 </p>
               </div>
 
-              <div className="w-full max-w-2xl space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-                <div className="relative group p-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 rounded-[2rem]">
-                  <div className="relative bg-[#0a0a0b] rounded-[1.9rem] overflow-hidden">
+              <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200 px-2">
+                <div className="relative group p-0.5 md:p-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 rounded-[1.5rem] md:rounded-[2rem]">
+                  <div className="relative bg-[#0a0a0b] rounded-[1.4rem] md:rounded-[1.9rem] overflow-hidden">
                     <input
                       type="text"
                       value={userInput}
                       onChange={(e) => setUserInput(e.target.value)}
                       placeholder="Prompt the engine (e.g., 'Crisis at the boardroom')..."
-                      className="w-full bg-transparent py-7 px-8 text-zinc-100 focus:outline-none text-xl placeholder:text-zinc-700 font-light"
+                      className="w-full bg-transparent py-5 md:py-7 px-6 md:px-8 text-zinc-100 focus:outline-none text-base md:text-xl placeholder:text-zinc-700 font-light"
                       onKeyDown={(e) => e.key === 'Enter' && userInput && startNewSimulation(userInput)}
                     />
                     <button
                       onClick={() => startNewSimulation(userInput)}
                       disabled={isLoading}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-white text-zinc-950 rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center disabled:opacity-50 disabled:grayscale shadow-xl"
+                      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white text-zinc-950 rounded-xl md:rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center disabled:opacity-50 disabled:grayscale shadow-xl"
                     >
-                      <i className="fa-solid fa-arrow-right-long text-xl"></i>
+                      <i className="fa-solid fa-arrow-right-long text-base md:text-xl"></i>
                     </button>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={() => startNewSimulation('Negotiating with a high-stakes investor')} className="px-6 py-3 bg-white/[0.03] border border-white/5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
+                <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                  <button onClick={() => startNewSimulation('Negotiating with a high-stakes investor')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
                     Capital Negotiation
                   </button>
-                  <button onClick={() => startNewSimulation('Navigating a power play in a team setting')} className="px-6 py-3 bg-white/[0.03] border border-white/5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
+                  <button onClick={() => startNewSimulation('Navigating a power play in a team setting')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
                     Status Power Play
                   </button>
-                  <button onClick={() => startNewSimulation('Public apology after a major strategic failure')} className="px-6 py-3 bg-white/[0.03] border border-white/5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
+                  <button onClick={() => startNewSimulation('Public apology after a major strategic failure')} className="px-4 py-2 md:px-6 md:py-3 bg-white/[0.03] border border-white/5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-400 hover:border-blue-500/30 hover:bg-white/[0.06] transition-all">
                     Crisis Comms
                   </button>
                 </div>
@@ -271,19 +269,19 @@ const App: React.FC = () => {
               {isLoading && !currentSim && (
                 <div className="fixed inset-0 z-50 flex flex-col items-center justify-center glass animate-in fade-in duration-500">
                    <div className="relative mb-12">
-                     <div className="w-24 h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
+                     <div className="w-20 h-20 md:w-24 md:h-24 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
                      <div className="absolute inset-0 flex items-center justify-center flex-col">
-                       <span className="text-blue-500 font-black text-lg">{Math.round(loadingProgress)}%</span>
+                       <span className="text-blue-500 font-black text-sm md:text-lg">{Math.round(loadingProgress)}%</span>
                      </div>
                    </div>
-                   <p className="text-2xl font-light tracking-[0.3em] uppercase text-blue-400 mt-4 animate-pulse">
+                   <p className="text-lg md:text-2xl font-light tracking-[0.2em] md:tracking-[0.3em] uppercase text-blue-400 mt-4 animate-pulse">
                      Synthesizing Arena
                    </p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="py-6">
+            <div className="py-2 md:py-6">
               {!currentSim.selectedChoiceId ? (
                 <SimulationScene
                   simulation={currentSim}
@@ -303,27 +301,27 @@ const App: React.FC = () => {
 
         {/* Beautiful Animated Reveal Loading Overlay */}
         {isLoading && currentSim && currentSim.selectedChoiceId && (
-          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center glass animate-in fade-in duration-700">
-            <div className="max-w-md w-full px-8 flex flex-col items-center space-y-10">
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center glass animate-in fade-in duration-700 px-6">
+            <div className="max-w-md w-full flex flex-col items-center space-y-8 md:space-y-10">
               {/* Central Visual Hub */}
-              <div className="relative w-32 h-32">
+              <div className="relative w-24 h-24 md:w-32 md:h-32">
                 {/* Layered Spinners */}
-                <div className="absolute inset-0 border-[3px] border-blue-500/5 border-t-blue-500 rounded-full animate-spin duration-[1.5s]"></div>
-                <div className="absolute inset-2 border-[2px] border-purple-500/5 border-b-purple-500 rounded-full animate-spin-reverse duration-[2s]"></div>
+                <div className="absolute inset-0 border-[2px] md:border-[3px] border-blue-500/5 border-t-blue-500 rounded-full animate-spin duration-[1.5s]"></div>
+                <div className="absolute inset-2 border-[1.5px] md:border-[2px] border-purple-500/5 border-b-purple-500 rounded-full animate-spin-reverse duration-[2s]"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <span className="text-3xl font-black text-white">{Math.round(loadingProgress)}</span>
-                    <span className="text-[10px] block font-black text-blue-500 -mt-1 uppercase tracking-tighter">%</span>
+                    <span className="text-2xl md:text-3xl font-black text-white">{Math.round(loadingProgress)}</span>
+                    <span className="text-[8px] md:text-[10px] block font-black text-blue-500 -mt-1 uppercase tracking-tighter">%</span>
                   </div>
                 </div>
               </div>
 
               {/* Status Header */}
               <div className="text-center space-y-2">
-                <h3 className="text-xl font-bold uppercase tracking-[0.3em] text-white animate-pulse">
+                <h3 className="text-base md:text-xl font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-white animate-pulse">
                   Extracting Tactical Insight
                 </h3>
-                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] h-4">
+                <p className="text-zinc-500 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] h-4">
                   {loadingStatus}
                 </p>
               </div>
@@ -339,10 +337,10 @@ const App: React.FC = () => {
               </div>
 
               {/* Bottom Subtle Tag */}
-              <div className="pt-4">
+              <div className="pt-2 md:pt-4">
                 <div className="flex items-center gap-2 opacity-30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
-                  <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Behavioural Engine 5.0 Synapse Bridge</span>
+                  <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                  <span className="text-[7px] md:text-[9px] uppercase font-black tracking-widest text-zinc-400">Behavioural Engine 5.0 Synapse Bridge</span>
                 </div>
               </div>
             </div>
